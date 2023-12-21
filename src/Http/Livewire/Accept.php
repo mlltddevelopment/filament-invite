@@ -33,6 +33,7 @@ class Accept extends SimplePage
     public $submitted = false;
 
     public $expired = false;
+    public $invite;
 
     /**
      * @var view-string
@@ -61,6 +62,11 @@ class Accept extends SimplePage
             ->where('token', $this->hash)
             ->where('expires_at', '>=', now())
             ->exists();
+
+        $this->invite = Invite::where('id', $this->acceptId)
+            ->where('token', $this->hash)
+            ->where('expires_at', '>=', now())
+            ->first();
 
         $this->form->fill();
     }
@@ -99,11 +105,10 @@ class Accept extends SimplePage
         $invite = Invite::query()
             ->where('id', $this->acceptId)
             ->where('token', $this->hash)
-            ->where('email', $data['email'])
             ->where('expires_at', '>=', now())
             ->firstOrFail();
 
-        $user = User::where('email', $data['email'])->first();
+        $user = User::where('email', $invite->email)->first();
 
         $user->update([
             'password' => $data['password'],
@@ -118,7 +123,7 @@ class Accept extends SimplePage
 
         if (! Filament::auth()->attempt($data)) {
             throw ValidationException::withMessages([
-                'data.email' => __('Login failed'),
+                'data.password' => __('Login failed'),
             ]);
 
             // session()->regenerate();
@@ -155,13 +160,13 @@ class Accept extends SimplePage
 
     protected function getEmailFormComponent(): Component
     {
+        $email = $this->invite ? $this->invite->email : '';
         return TextInput::make('email')
             ->label(__('E-mail address'))
-            ->email()
-            ->required()
             ->autocomplete()
             ->autofocus()
-            ->extraInputAttributes(['tabindex' => 1]);
+            ->default($email)
+            ->disabled()
     }
 
     protected function getPasswordFormComponent(): Component
@@ -175,7 +180,7 @@ class Accept extends SimplePage
                 Password::defaults(),
             ])
             ->confirmed()
-            ->extraInputAttributes(['tabindex' => 2]);
+            ->extraInputAttributes(['tabindex' => 1]);
     }
 
     protected function getPasswordConfirmationFormComponent(): Component
@@ -184,7 +189,7 @@ class Accept extends SimplePage
             ->label(__('Password confirmation'))
             ->password()
             ->required()
-            ->extraInputAttributes(['tabindex' => 3]);
+            ->extraInputAttributes(['tabindex' => 2]);
     }
 
     /**
