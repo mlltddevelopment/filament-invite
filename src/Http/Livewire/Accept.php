@@ -19,6 +19,7 @@ use Filament\Pages\SimplePage;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Auth;
 
 class Accept extends SimplePage
 {
@@ -120,16 +121,7 @@ class Accept extends SimplePage
         event(new InviteProcessedEvent($user, $data['password']));
 
         $this->submitted = true;
-
-        if (! Filament::auth()->attempt($data)) {
-            throw ValidationException::withMessages([
-                'data.password' => __('Login failed'),
-            ]);
-
-            // session()->regenerate();
-
-            return route('filament.auth.login');
-        }
+        Auth::login($user);
 
         return redirect()->intended(route(config('filament-invite.after_login_redirect_route')));
 
@@ -163,10 +155,8 @@ class Accept extends SimplePage
         $email = $this->invite ? $this->invite->email : '';
         return TextInput::make('email')
             ->label(__('E-mail address'))
-            ->autocomplete()
-            ->autofocus()
             ->default($email)
-            ->disabled()
+            ->disabled();
     }
 
     protected function getPasswordFormComponent(): Component
