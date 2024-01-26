@@ -9,6 +9,8 @@ use Concept7\FilamentInvite\Notifications\SendInviteNotification;
 
 trait Invitable
 {
+    public abstract function afterInviteAcceptanceRedirectTo();
+    
     public static function bootInvitable()
     {
         static::created(function (User $user) {

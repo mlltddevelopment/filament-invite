@@ -123,7 +123,7 @@ class Accept extends SimplePage
         $this->submitted = true;
         Auth::login($user);
 
-        return redirect()->intended(route(config('filament-invite.after_login_redirect_route')));
+        return redirect()->intended($user->afterInviteAcceptanceRedirectTo());
 
     }
 
