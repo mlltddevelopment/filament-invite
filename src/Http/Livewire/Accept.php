@@ -123,7 +123,7 @@ class Accept extends SimplePage
         $this->submitted = true;
         Auth::login($user);
 
-        return redirect()->intended($user->afterInviteAcceptanceRedirectTo());
+        return redirect($user->afterInviteAcceptanceRedirectTo());
 
     }
 
