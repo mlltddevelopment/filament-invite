@@ -34,6 +34,8 @@ class Accept extends SimplePage
 
     public $expired = false;
 
+    public static function registerNavigationItems(): void {}
+
     /**
      * @var view-string
      */
