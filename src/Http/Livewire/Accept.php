@@ -36,6 +36,8 @@ class Accept extends SimplePage
     public $expired = false;
     public $invite;
 
+    public static function registerNavigationItems(): void {}
+
     /**
      * @var view-string
      */
